@@ -18,6 +18,201 @@ static void free_analytree(struct pkt_analytree *analytree)
 	analytree->next = NULL;
 	free(analytree);
 }
+static int tcp_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
+		const unsigned char *data, unsigned int size)
+{
+	struct pkt_analytree *atree;
+	struct pkt_analytree *child;
+	struct npt_tcp_hdr *hdr;
+	uint16_t sport;       /* source port */
+	uint16_t dport;       /* destination port */
+	uint32_t seq;
+	uint32_t ack;
+	uint16_t hdr_len;
+	uint8_t tcp_flags;
+	uint16_t win;         /* window */
+	uint16_t sum;         /* checksum */
+	uint16_t urp;         /* urgent pointer */
+
+	int ret;
+	ret = 0;
+
+	if ((atree = malloc(sizeof(*atree))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		*analytree = NULL;
+		return -1;
+	}
+	bzero(atree, sizeof(*atree));
+
+	hdr = (struct npt_tcp_hdr *)data;
+
+	sport = ntohs(hdr->th_sport);
+	dport = ntohs(hdr->th_dport);
+	seq = ntohl(hdr->th_seq);
+	ack = ntohl(hdr->th_ack);
+	hdr_len = hdr->th_off;
+	tcp_flags = hdr->th_flags;
+
+	win = ntohs(hdr->th_win);
+	sum = ntohs(hdr->th_sum);
+	urp = ntohs(hdr->th_urp);
+
+	if (size < NPT_TCP_H) 
+		goto err;
+
+	strncpy(atree->comment, "TCP protocol", STR_COMMENT_LEN);
+	atree->next = NULL;
+	if ((atree->child = malloc(sizeof(*atree))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = atree->child;
+	snprintf(child->comment, STR_INFO_LEN, "Source port: %u", sport);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "Destination port: %u", dport);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "seq: %u", seq);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "ack: %u", ack);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "hdr length: %u", hdr_len);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "flag: 0x%u", tcp_flags);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "win: %u", win);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "sum: %u", sum);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "urp: %u", urp);
+	child->child = NULL;
+	child->next = NULL;
+
+	snprintf(summ->proto, STR_PROTO_LEN, "tcp");
+
+	ret = 0;
+	
+	*analytree = atree;
+	return ret;	
+err:
+	free_analytree(atree);
+	*analytree = NULL;
+	return -1;
+
+}
+static int udp_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
+		const unsigned char *data, unsigned int size)
+{
+	struct pkt_analytree *atree;
+	struct pkt_analytree *child;
+	struct npt_udp_hdr *hdr;
+	uint16_t sport;       /* source port */
+	uint16_t dport;       /* destination port */
+	uint16_t ulen;        /* length */
+	uint16_t sum;         /* checksum */
+	int ret;
+	ret = 0;
+
+	if ((atree = malloc(sizeof(*atree))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		*analytree = NULL;
+		return -1;
+	}
+	bzero(atree, sizeof(*atree));
+
+	hdr = (struct npt_udp_hdr *)data;
+
+	sport = ntohs(hdr->uh_sport);
+	dport = ntohs(hdr->uh_dport);
+	ulen = ntohs(hdr->uh_ulen);
+	sum = ntohs(hdr->uh_sum);
+
+	if (size < NPT_UDP_H) 
+		goto err;
+
+	strncpy(atree->comment, "UDP protocol", STR_COMMENT_LEN);
+	atree->next = NULL;
+	if ((atree->child = malloc(sizeof(*atree))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = atree->child;
+	snprintf(child->comment, STR_INFO_LEN, "Source port: %u", sport);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "Destination port: %u", dport);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "udp length: %u", ulen);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "check sum : 0x%x", sum);
+	child->child = NULL;
+	child->next = NULL;
+
+	snprintf(summ->proto, STR_PROTO_LEN, "udp");
+
+	ret = 0;
+	
+	*analytree = atree;
+	return ret;	
+err:
+	free_analytree(atree);
+	*analytree = NULL;
+	return -1;
+
+}
 static int ip_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 		const unsigned char *data, unsigned int size)
 {
@@ -99,25 +294,29 @@ static int ip_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 	child->next = NULL;
 
 	ret = -1;
-/*
+
 	switch(proto) {
-	case 0:
+	case IP_PROTO_UDP:
+		ret = udp_dump(summ, &(atree->next), data + NPT_IPV4_H, size - NPT_IPV4_H);
+		break;
+	case IP_PROTO_TCP:
+		ret = tcp_dump(summ, &(atree->next), data + NPT_IPV4_H, size - NPT_IPV4_H);
+		break;
 	}
-*/
+	snprintf(summ->dst, STR_DST_LEN, "%u.%u.%u.%u",
+			hdr->ip_dst[0], hdr->ip_dst[1], hdr->ip_dst[2], hdr->ip_dst[3]);
+
+	snprintf(summ->src, STR_SRC_LEN, "%u.%u.%u.%u",
+			hdr->ip_src[0], hdr->ip_src[1], hdr->ip_src[2], hdr->ip_src[3]);
+
+	if (hdr->ip_dst[0] == 0xff && hdr->ip_dst[1] == 0xff &&
+			hdr->ip_dst[2] == 0xff && hdr->ip_dst[3] == 0xff) {
+		snprintf(summ->info, STR_INFO_LEN, "%s broadcast", summ->src);
+	} else {
+		snprintf(summ->info, STR_INFO_LEN, "%s -> %s", summ->src, summ->dst);
+	}
 	if (ret != 0) {
-		snprintf(summ->dst, STR_DST_LEN, "%u.%u.%u.%u",
-				hdr->ip_dst[0], hdr->ip_dst[1], hdr->ip_dst[2], hdr->ip_dst[3]);
-
-		snprintf(summ->src, STR_SRC_LEN, "%u.%u.%u.%u",
-				hdr->ip_src[0], hdr->ip_src[1], hdr->ip_src[2], hdr->ip_src[3]);
-
 		snprintf(summ->proto, STR_PROTO_LEN, "ip");
-		if (hdr->ip_dst[0] == 0xff && hdr->ip_dst[1] == 0xff &&
-				hdr->ip_dst[2] == 0xff && hdr->ip_dst[3] == 0xff) {
-			snprintf(summ->info, STR_INFO_LEN, "%s broadcast", summ->src);
-		} else {
-			snprintf(summ->info, STR_INFO_LEN, "%s -> %s", summ->src, summ->dst);
-		}
 	}
 	ret = 0;
 	
@@ -248,34 +447,4 @@ int pkt_analyse(struct pkt_summary **summary, struct pkt_analytree **analytree,
 	*summary = summ;
 	*analytree = atree;
 	return ret;
-
-/*
-	snprintf(summ->dst, STR_DST_LEN, "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
-			data[0], data[1], data[2], data[3], data[4], data[5]);
-
-	snprintf(summ->src, STR_SRC_LEN, "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
-			data[6], data[7], data[8], data[9], data[10], data[11]);
-
-	snprintf(summ->proto, STR_PROTO_LEN, "ethernet");
-	summ->len = len;
-	summ->caplen = caplen;
-	snprintf(summ->info, STR_INFO_LEN, "infomation");
-
-
-	strncpy(atree->comment, "ethernet protocol", STR_COMMENT_LEN);
-	atree->next = malloc(sizeof(*atree));
-	atree->child = malloc(sizeof(*atree));
-
-	strncpy(atree->next->comment, "IP protocol", STR_COMMENT_LEN);
-	atree->next->next = NULL;
-	atree->next->child = NULL;
-
-	strncpy(atree->child->comment, "child1", STR_COMMENT_LEN);
-	atree->child->next = malloc(sizeof(*atree));
-	atree->child->child = NULL;
-
-	strncpy(atree->child->next->comment, "child2", STR_COMMENT_LEN);
-	atree->child->next->next = NULL;
-	atree->child->next->child = NULL;
-*/
 }

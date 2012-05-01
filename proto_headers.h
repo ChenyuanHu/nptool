@@ -152,6 +152,12 @@ struct npt_ipv4_hdr
 #endif
     uint8_t ip_ttl;          /* time to live */
     uint8_t ip_p;            /* protocol */
+#ifndef IP_PROTO_UDP
+#define IP_PROTO_UDP 17
+#endif
+#ifndef IP_PROTO_TCP
+#define IP_PROTO_TCP 6
+#endif
     uint16_t ip_sum;         /* checksum */
     uint8_t ip_src[IPV4_ADDR_LEN]; 
 	uint8_t ip_dst[IPV4_ADDR_LEN]; /* source and dest address */
