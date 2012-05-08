@@ -74,14 +74,14 @@ static int icmpv4_dump(struct pkt_summary *summ, struct pkt_analytree **analytre
 		goto err;
 	}
 	child = atree->child;
-	snprintf(child->comment, STR_INFO_LEN, "Type: %u (%s)", type, pchar);
+	snprintf(child->comment, STR_COMMENT_LEN, "Type: %u (%s)", type, pchar);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "Code: %u", code);
+	snprintf(child->comment, STR_COMMENT_LEN, "Code: %u", code);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
@@ -89,26 +89,26 @@ static int icmpv4_dump(struct pkt_summary *summ, struct pkt_analytree **analytre
 	}
 	if (type == ICMP_ECHOREPLY && type == ICMP_ECHO) {
 		child = child->next;
-		snprintf(child->comment, STR_INFO_LEN, "Checksum: %u", checksum);
+		snprintf(child->comment, STR_COMMENT_LEN, "Checksum: %u", checksum);
 		child->child = NULL;
 		if ((child->next = malloc(sizeof(*child))) == NULL) {
 			fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 			goto err;
 		}
 		child = child->next;
-		snprintf(child->comment, STR_INFO_LEN, "Identifier: %u", ident);
+		snprintf(child->comment, STR_COMMENT_LEN, "Identifier: %u", ident);
 		child->child = NULL;
 		if ((child->next = malloc(sizeof(*child))) == NULL) {
 			fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 			goto err;
 		}
 		child = child->next;
-		snprintf(child->comment, STR_INFO_LEN, "Sequence number: %u", seq_num);
+		snprintf(child->comment, STR_COMMENT_LEN, "Sequence number: %u", seq_num);
 		child->child = NULL;
 		child->next = NULL;
 	} else {
 		child = child->next;
-		snprintf(child->comment, STR_INFO_LEN, "Checksum: %u", checksum);
+		snprintf(child->comment, STR_COMMENT_LEN, "Checksum: %u", checksum);
 		child->child = NULL;
 		child->next = NULL;
 	}
@@ -176,63 +176,63 @@ static int tcp_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 		goto err;
 	}
 	child = atree->child;
-	snprintf(child->comment, STR_INFO_LEN, "Source port: %u", sport);
+	snprintf(child->comment, STR_COMMENT_LEN, "Source port: %u", sport);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "Destination port: %u", dport);
+	snprintf(child->comment, STR_COMMENT_LEN, "Destination port: %u", dport);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "seq: %u", seq);
+	snprintf(child->comment, STR_COMMENT_LEN, "seq: %u", seq);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "ack: %u", ack);
+	snprintf(child->comment, STR_COMMENT_LEN, "ack: %u", ack);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "hdr length: %u", hdr_len);
+	snprintf(child->comment, STR_COMMENT_LEN, "hdr length: %u", hdr_len);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "flag: 0x%u", tcp_flags);
+	snprintf(child->comment, STR_COMMENT_LEN, "flag: 0x%u", tcp_flags);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "win: %u", win);
+	snprintf(child->comment, STR_COMMENT_LEN, "win: %u", win);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "sum: %u", sum);
+	snprintf(child->comment, STR_COMMENT_LEN, "sum: %u", sum);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "urp: %u", urp);
+	snprintf(child->comment, STR_COMMENT_LEN, "urp: %u", urp);
 	child->child = NULL;
 	child->next = NULL;
 
@@ -285,28 +285,28 @@ static int udp_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 		goto err;
 	}
 	child = atree->child;
-	snprintf(child->comment, STR_INFO_LEN, "Source port: %u", sport);
+	snprintf(child->comment, STR_COMMENT_LEN, "Source port: %u", sport);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "Destination port: %u", dport);
+	snprintf(child->comment, STR_COMMENT_LEN, "Destination port: %u", dport);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "udp length: %u", ulen);
+	snprintf(child->comment, STR_COMMENT_LEN, "udp length: %u", ulen);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "check sum : 0x%x", sum);
+	snprintf(child->comment, STR_COMMENT_LEN, "check sum : 0x%x", sum);
 	child->child = NULL;
 	child->next = NULL;
 
@@ -333,7 +333,7 @@ static int arp_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 	uint16_t hrd;         /* format of hardware address */
 	uint16_t pro;         /* format of protocol address */
 	uint8_t  hln;         /* length of hardware address */
-	uint8_t  pln;         /* length of protocol addres */
+	uint8_t  pln;         /* length of protocol address */
 	uint16_t op;          /* operation type */
 
 	char *htype;
@@ -431,41 +431,93 @@ static int arp_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 		goto err;
 	}
 	child = atree->child;
-	snprintf(child->comment, STR_INFO_LEN, "Hardware type: %s", htype);
+	snprintf(child->comment, STR_COMMENT_LEN, "Hardware type: %s", htype);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "Protocol type: %d", pro);
+	snprintf(child->comment, STR_COMMENT_LEN, "Protocol type: 0x%x", pro);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "Hardware address length: %u", hln);
+	snprintf(child->comment, STR_COMMENT_LEN, "Hardware address length: %u", hln);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "Protocol address length: %u", pln);
+	snprintf(child->comment, STR_COMMENT_LEN, "Protocol address length: %u", pln);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
-	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "Operation Type : %s", optype);
-	child->child = NULL;
-	child->next = NULL;
+	if (pln == 4 && hln == 6 && pro == ETHERTYPE_IP && hrd == ARPHRD_ETHER) {
+		child = child->next;
+		snprintf(child->comment, STR_COMMENT_LEN, "Operation Type : %s", optype);
+		child->child = NULL;
+		if ((child->next = malloc(sizeof(*child))) == NULL) {
+			fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+			goto err;
+		}
+		child = child->next;
+		snprintf(child->comment, STR_COMMENT_LEN, "Sender MAC address:"
+				" %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
+				data[NPT_ARP_H + 0], data[NPT_ARP_H + 1], data[NPT_ARP_H + 2],
+				data[NPT_ARP_H + 3], data[NPT_ARP_H + 4], data[NPT_ARP_H + 5]);
+		child->child = NULL;
+		if ((child->next = malloc(sizeof(*child))) == NULL) {
+			fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+			goto err;
+		}
+		child = child->next;
+		snprintf(child->comment, STR_COMMENT_LEN, "Sender IP address: %u.%u.%u.%u",
+				data[NPT_ARP_H + 6], data[NPT_ARP_H + 7],
+				data[NPT_ARP_H + 8], data[NPT_ARP_H + 9]);
+		child->child = NULL;
+		if ((child->next = malloc(sizeof(*child))) == NULL) {
+			fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+			goto err;
+		}
+		child = child->next;
+		snprintf(child->comment, STR_COMMENT_LEN, "Target MAC address:"
+				" %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
+				data[NPT_ARP_H + 10], data[NPT_ARP_H + 11], data[NPT_ARP_H + 12],
+				data[NPT_ARP_H + 13], data[NPT_ARP_H + 14], data[NPT_ARP_H + 15]);
+		child->child = NULL;
+		if ((child->next = malloc(sizeof(*child))) == NULL) {
+			fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+			goto err;
+		}
+		child = child->next;
+		snprintf(child->comment, STR_COMMENT_LEN, "Target IP address: %u.%u.%u.%u",
+				data[NPT_ARP_H + 16], data[NPT_ARP_H + 17],
+				data[NPT_ARP_H + 18], data[NPT_ARP_H + 19]);
+		child->child = NULL;
+		child->next = NULL;
+
+		snprintf(summ->info, STR_INFO_LEN, "Who has %u.%u.%u.%u? Tell %u.%u.%u.%u",
+				data[NPT_ARP_H + 16], data[NPT_ARP_H + 17],
+				data[NPT_ARP_H + 18], data[NPT_ARP_H + 19],
+				data[NPT_ARP_H + 6], data[NPT_ARP_H + 7],
+				data[NPT_ARP_H + 8], data[NPT_ARP_H + 9]);
+		ret = UPDATE_INFO;
+	} else {
+		child = child->next;
+		snprintf(child->comment, STR_COMMENT_LEN, "Operation Type : %s", optype);
+		child->child = NULL;
+		child->next = NULL;
+	}
 
 	snprintf(summ->proto, STR_PROTO_LEN, "ARP");
 
-	ret = UPDATE_PRO;
+	ret = ret | UPDATE_PRO;
 	
 	*analytree = atree;
 	return ret;	
@@ -514,7 +566,7 @@ static int ipv4_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 		goto err;
 	}
 	child = atree->child;
-	snprintf(child->comment, STR_INFO_LEN, "Source IP: %u.%u.%u.%u",
+	snprintf(child->comment, STR_COMMENT_LEN, "Source IP: %u.%u.%u.%u",
 			hdr->ip_src[0], hdr->ip_src[1], hdr->ip_src[2], hdr->ip_src[3]);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
@@ -522,7 +574,7 @@ static int ipv4_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "Destination IP: %u.%u.%u.%u",
+	snprintf(child->comment, STR_COMMENT_LEN, "Destination IP: %u.%u.%u.%u",
 			hdr->ip_dst[0], hdr->ip_dst[1], hdr->ip_dst[2], hdr->ip_dst[3]);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
@@ -530,28 +582,28 @@ static int ipv4_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "ip head length: %u", ip_head_len);
+	snprintf(child->comment, STR_COMMENT_LEN, "ip head length: %u", ip_head_len);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "ip length: %u", ip_len);
+	snprintf(child->comment, STR_COMMENT_LEN, "ip length: %u", ip_len);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "ip version: %u", ip_ver);
+	snprintf(child->comment, STR_COMMENT_LEN, "ip version: %u", ip_ver);
 	child->child = NULL;
 	if ((child->next = malloc(sizeof(*child))) == NULL) {
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "proto : 0x%x", proto);
+	snprintf(child->comment, STR_COMMENT_LEN, "proto : 0x%x", proto);
 	child->child = NULL;
 	child->next = NULL;
 
@@ -629,7 +681,7 @@ static int ethernet_dump(struct pkt_summary *summ, struct pkt_analytree **analyt
 		goto err;
 	}
 	child = atree->child;
-	snprintf(child->comment, STR_INFO_LEN, 
+	snprintf(child->comment, STR_COMMENT_LEN, 
 			"Source MAC: %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
 			hdr->ether_shost[0], hdr->ether_shost[1], 
 			hdr->ether_shost[2], hdr->ether_shost[3], 
@@ -641,7 +693,7 @@ static int ethernet_dump(struct pkt_summary *summ, struct pkt_analytree **analyt
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, 
+	snprintf(child->comment, STR_COMMENT_LEN, 
 			"Destination MAC: %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
 			hdr->ether_dhost[0], hdr->ether_dhost[1], 
 			hdr->ether_dhost[2], hdr->ether_dhost[3], 
@@ -653,7 +705,7 @@ static int ethernet_dump(struct pkt_summary *summ, struct pkt_analytree **analyt
 		goto err;
 	}
 	child = child->next;
-	snprintf(child->comment, STR_INFO_LEN, "type : 0x%x", proto);
+	snprintf(child->comment, STR_COMMENT_LEN, "type : 0x%x", proto);
 	child->child = NULL;
 	child->next = NULL;
 
@@ -667,11 +719,18 @@ static int ethernet_dump(struct pkt_summary *summ, struct pkt_analytree **analyt
 		break;
 	}
 
-	if (ret < 0 || ((ret & UPDATE_DST) != UPDATE_DST))
-		snprintf(summ->dst, STR_DST_LEN, "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
-				hdr->ether_dhost[0], hdr->ether_dhost[1], 
-				hdr->ether_dhost[2], hdr->ether_dhost[3], 
-				hdr->ether_dhost[4], hdr->ether_dhost[5]);
+	if (ret < 0 || ((ret & UPDATE_DST) != UPDATE_DST)) {
+		if (hdr->ether_dhost[0] == 0xff && hdr->ether_dhost[1] == 0xff &&
+				hdr->ether_dhost[2] == 0xff && hdr->ether_dhost[3] == 0xff &&
+				hdr->ether_dhost[4] == 0xff && hdr->ether_dhost[5] == 0xff) {
+			snprintf(summ->dst, STR_DST_LEN, "Broadcast");
+		} else {
+			snprintf(summ->dst, STR_DST_LEN, "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
+					hdr->ether_dhost[0], hdr->ether_dhost[1], 
+					hdr->ether_dhost[2], hdr->ether_dhost[3], 
+					hdr->ether_dhost[4], hdr->ether_dhost[5]);
+		}
+	}
 
 	if (ret < 0 || ((ret & UPDATE_SRC) != UPDATE_SRC))
 		snprintf(summ->src, STR_SRC_LEN, "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",

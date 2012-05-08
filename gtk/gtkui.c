@@ -100,6 +100,16 @@ void gui_set_interface_list(struct interface_list *list)
 	itfc_list = list;
 }
 
+static void widget_set_default_font(GtkWidget *widget)
+{
+	PangoFontDescription *font_desc;
+	gchar *fontname = "DejaVu Sans Mono 10";
+
+	font_desc = pango_font_description_from_string(fontname);
+
+	gtk_widget_modify_font(widget, font_desc);
+
+}
 static void bar_stop_clicked(GtkWidget *widget, gpointer *arg)
 {
 	pthread_mutex_lock(&start_cap_mutex);
@@ -335,8 +345,6 @@ static struct gtkui_pktlist* build_pktlist()
 	GtkTreeViewColumn *col;
 	GtkTreeIter *iter;
 	GtkTreeSelection *sel;
-	PangoFontDescription *font_desc;
-	gchar *fontname = "DejaVu Sans Mono 10";
 	int i;
 
 	pktlist = g_malloc(sizeof(*pktlist));
@@ -349,8 +357,7 @@ static struct gtkui_pktlist* build_pktlist()
 
 	pktwid = gtk_tree_view_new();
 
-	font_desc = pango_font_description_from_string(fontname);
-	gtk_widget_modify_font(GTK_WIDGET(pktwid), font_desc);
+	widget_set_default_font(GTK_WIDGET(pktwid));
 
 	for (i = 0; i < PKTL_COLUMNS; i++) {
 		renderer = gtk_cell_renderer_text_new();
@@ -398,6 +405,8 @@ static struct gtkui_analytree* build_analytree()
 
 	wid = gtk_tree_view_new();
 
+	widget_set_default_font(GTK_WIDGET(wid));
+
 	col = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_title(col, "protocol analyse");
 	gtk_tree_view_append_column(GTK_TREE_VIEW(wid), col);
@@ -419,14 +428,10 @@ static struct gtkui_analytree* build_analytree()
 static GtkWidget* build_byteview()
 {
 	GtkWidget *byteview;
-	PangoFontDescription *font_desc;
-	gchar *fontname = "DejaVu Sans Mono 10";
 
 	byteview = gtk_text_view_new();
 
-	font_desc = pango_font_description_from_string(fontname);
-
-	gtk_widget_modify_font(GTK_WIDGET(byteview), font_desc);
+	widget_set_default_font(GTK_WIDGET(byteview));
 
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(byteview), FALSE);
 
