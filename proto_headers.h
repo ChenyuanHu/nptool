@@ -153,10 +153,13 @@ struct npt_ipv4_hdr
     uint8_t ip_ttl;          /* time to live */
     uint8_t ip_p;            /* protocol */
 #ifndef IP_PROTO_UDP
-#define IP_PROTO_UDP 17
+#define IP_PROTO_UDP 0x11
 #endif
 #ifndef IP_PROTO_TCP
-#define IP_PROTO_TCP 6
+#define IP_PROTO_TCP 0x06
+#endif
+#ifndef IP_PROTO_ICMPV4
+#define IP_PROTO_ICMPV4 0x01
 #endif
     uint16_t ip_sum;         /* checksum */
     uint8_t ip_src[IPV4_ADDR_LEN]; 
@@ -251,6 +254,183 @@ struct npt_udp_hdr
     uint16_t uh_dport;       /* destination port */
     uint16_t uh_ulen;        /* length */
     uint16_t uh_sum;         /* checksum */
+};
+
+
+/*
+ *  ICMP header
+ *  Internet Control Message Protocol
+ *  Base header size: 4 bytes
+ */
+struct npt_icmpv4_hdr
+{
+    uint8_t icmp_type;       /* ICMP type */
+#ifndef     ICMP_ECHOREPLY
+#define     ICMP_ECHOREPLY                  0
+#endif
+#ifndef     ICMP_UNREACH
+#define     ICMP_UNREACH                    3
+#endif
+#ifndef     ICMP_SOURCEQUENCH
+#define     ICMP_SOURCEQUENCH               4
+#endif
+#ifndef     ICMP_REDIRECT
+#define     ICMP_REDIRECT                   5
+#endif
+#ifndef     ICMP_ECHO
+#define     ICMP_ECHO                       8
+#endif
+#ifndef     ICMP_ROUTERADVERT
+#define     ICMP_ROUTERADVERT               9
+#endif
+#ifndef     ICMP_ROUTERSOLICIT
+#define     ICMP_ROUTERSOLICIT              10
+#endif
+#ifndef     ICMP_TIMXCEED
+#define     ICMP_TIMXCEED                   11
+#endif
+#ifndef     ICMP_PARAMPROB
+#define     ICMP_PARAMPROB                  12
+#endif
+#ifndef     ICMP_TSTAMP
+#define     ICMP_TSTAMP                     13
+#endif
+#ifndef     ICMP_TSTAMPREPLY
+#define     ICMP_TSTAMPREPLY                14
+#endif
+#ifndef     ICMP_IREQ
+#define     ICMP_IREQ                       15
+#endif
+#ifndef     ICMP_IREQREPLY
+#define     ICMP_IREQREPLY                  16
+#endif
+#ifndef     ICMP_MASKREQ
+#define     ICMP_MASKREQ                    17
+#endif
+#ifndef     ICMP_MASKREPLY
+#define     ICMP_MASKREPLY                  18
+#endif
+    uint8_t icmp_code;       /* ICMP code */
+#ifndef     ICMP_UNREACH_NET
+#define     ICMP_UNREACH_NET                0
+#endif
+#ifndef     ICMP_UNREACH_HOST
+#define     ICMP_UNREACH_HOST               1
+#endif
+#ifndef     ICMP_UNREACH_PROTOCOL
+#define     ICMP_UNREACH_PROTOCOL           2
+#endif
+#ifndef     ICMP_UNREACH_PORT
+#define     ICMP_UNREACH_PORT               3
+#endif
+#ifndef     ICMP_UNREACH_NEEDFRAG
+#define     ICMP_UNREACH_NEEDFRAG           4
+#endif
+#ifndef     ICMP_UNREACH_SRCFAIL
+#define     ICMP_UNREACH_SRCFAIL            5
+#endif
+#ifndef     ICMP_UNREACH_NET_UNKNOWN
+#define     ICMP_UNREACH_NET_UNKNOWN        6
+#endif
+#ifndef     ICMP_UNREACH_HOST_UNKNOWN
+#define     ICMP_UNREACH_HOST_UNKNOWN       7
+#endif
+#ifndef     ICMP_UNREACH_ISOLATED
+#define     ICMP_UNREACH_ISOLATED           8
+#endif
+#ifndef     ICMP_UNREACH_NET_PROHIB
+#define     ICMP_UNREACH_NET_PROHIB         9
+#endif
+#ifndef     ICMP_UNREACH_HOST_PROHIB
+#define     ICMP_UNREACH_HOST_PROHIB        10
+#endif
+#ifndef     ICMP_UNREACH_TOSNET
+#define     ICMP_UNREACH_TOSNET             11
+#endif
+#ifndef     ICMP_UNREACH_TOSHOST
+#define     ICMP_UNREACH_TOSHOST            12
+#endif
+#ifndef     ICMP_UNREACH_FILTER_PROHIB
+#define     ICMP_UNREACH_FILTER_PROHIB      13
+#endif
+#ifndef     ICMP_UNREACH_HOST_PRECEDENCE
+#define     ICMP_UNREACH_HOST_PRECEDENCE    14
+#endif
+#ifndef     ICMP_UNREACH_PRECEDENCE_CUTOFF
+#define     ICMP_UNREACH_PRECEDENCE_CUTOFF  15
+#endif
+#ifndef     ICMP_REDIRECT_NET
+#define     ICMP_REDIRECT_NET               0
+#endif
+#ifndef     ICMP_REDIRECT_HOST
+#define     ICMP_REDIRECT_HOST              1
+#endif
+#ifndef     ICMP_REDIRECT_TOSNET
+#define     ICMP_REDIRECT_TOSNET            2
+#endif
+#ifndef     ICMP_REDIRECT_TOSHOST
+#define     ICMP_REDIRECT_TOSHOST           3
+#endif
+#ifndef     ICMP_TIMXCEED_INTRANS
+#define     ICMP_TIMXCEED_INTRANS           0
+#endif
+#ifndef     ICMP_TIMXCEED_REASS
+#define     ICMP_TIMXCEED_REASS             1
+#endif
+#ifndef     ICMP_PARAMPROB_OPTABSENT
+#define     ICMP_PARAMPROB_OPTABSENT        1
+#endif
+
+    uint16_t icmp_sum;   /* ICMP Checksum */
+
+    union
+    {
+        struct
+        {
+            uint16_t id; /* ICMP id */
+            uint16_t seq;/* ICMP sequence number */
+        } echo;
+
+#undef icmp_id
+#undef icmp_seq
+#define icmp_id     hun.echo.id
+#define icmp_seq    hun.echo.seq
+ 
+        uint32_t gateway; /* gateway host */
+        struct
+        {
+            uint16_t pad;/* padding */
+            uint16_t mtu;/* MTU size */
+        } frag;
+    } hun;
+    union
+    {
+        struct
+        {
+            uint32_t its_otime;
+            uint32_t its_rtime;
+            uint32_t its_ttime;
+        } ts;
+        struct
+        {
+            struct npt_ipv4_hdr idi_ip;
+            /* options and then 64 bits of data */
+        } ip;
+        uint32_t mask;
+        int8_t data[1];
+
+#undef icmp_mask
+#define icmp_mask    dun.mask
+#undef icmp_data
+#define icmp_data    dun.data
+
+#undef icmp_otime
+#define icmp_otime   dun.ts.its_otime
+#undef icmp_rtime
+#define icmp_rtime   dun.ts.its_rtime
+#undef icmp_ttime
+#define icmp_ttime   dun.ts.its_ttime
+    }dun;
 };
 
 #endif /* __PROTO_HEADERS_H__ */

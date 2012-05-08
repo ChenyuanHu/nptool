@@ -23,6 +23,110 @@ static void free_analytree(struct pkt_analytree *analytree)
 	analytree->next = NULL;
 	free(analytree);
 }
+
+static int icmpv4_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
+		const unsigned char *data, unsigned int size)
+{
+	struct pkt_analytree *atree;
+	struct pkt_analytree *child;
+	struct npt_icmpv4_hdr *hdr;
+
+	uint8_t type;
+	uint8_t code;
+	uint16_t checksum;
+	uint16_t ident;
+	uint16_t seq_num;
+
+	char *pchar;
+
+	int ret;
+	ret = 0;
+
+	if ((atree = malloc(sizeof(*atree))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		*analytree = NULL;
+		return -1;
+	}
+	bzero(atree, sizeof(*atree));
+
+	hdr = (struct npt_icmpv4_hdr *)data;
+
+	type = hdr->icmp_type;
+	code = hdr->icmp_code;
+	checksum = ntohs(hdr->icmp_sum);
+	ident = ntohs(hdr->hun.echo.id);
+	seq_num = ntohs(hdr->hun.echo.seq);
+
+	if (type == 8)
+		pchar = "Echo (ping) request";
+	else if (type == 0)
+		pchar = "Echo (ping) reply";
+	else
+		pchar = "";
+
+	if (size < NPT_ICMPV4_ECHO_H) 
+		goto err;
+
+	strncpy(atree->comment, "ICMP protocol", STR_COMMENT_LEN);
+	atree->next = NULL;
+	if ((atree->child = malloc(sizeof(*atree))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = atree->child;
+	snprintf(child->comment, STR_INFO_LEN, "Type: %u (%s)", type, pchar);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	child = child->next;
+	snprintf(child->comment, STR_INFO_LEN, "Code: %u", code);
+	child->child = NULL;
+	if ((child->next = malloc(sizeof(*child))) == NULL) {
+		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+		goto err;
+	}
+	if (type == 0 && type == 8) {
+		child = child->next;
+		snprintf(child->comment, STR_INFO_LEN, "Checksum: %u", checksum);
+		child->child = NULL;
+		if ((child->next = malloc(sizeof(*child))) == NULL) {
+			fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+			goto err;
+		}
+		child = child->next;
+		snprintf(child->comment, STR_INFO_LEN, "Identifier: %u", ident);
+		child->child = NULL;
+		if ((child->next = malloc(sizeof(*child))) == NULL) {
+			fprintf(stderr, "malloc err %s\n", __FUNCTION__);
+			goto err;
+		}
+		child = child->next;
+		snprintf(child->comment, STR_INFO_LEN, "Sequence number: %u", seq_num);
+		child->child = NULL;
+		child->next = NULL;
+	} else {
+		child = child->next;
+		snprintf(child->comment, STR_INFO_LEN, "Checksum: %u", checksum);
+		child->child = NULL;
+		child->next = NULL;
+	}
+
+	snprintf(summ->proto, STR_PROTO_LEN, "ICMP");
+
+	snprintf(summ->info, STR_INFO_LEN, "%s", pchar);
+
+	ret = UPDATE_PRO | UPDATE_INFO;
+	
+	*analytree = atree;
+	return ret;	
+err:
+	free_analytree(atree);
+	*analytree = NULL;
+	return -1;
+
+}
 static int tcp_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 		const unsigned char *data, unsigned int size)
 {
@@ -132,7 +236,7 @@ static int tcp_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 	child->child = NULL;
 	child->next = NULL;
 
-	snprintf(summ->proto, STR_PROTO_LEN, "tcp");
+	snprintf(summ->proto, STR_PROTO_LEN, "TCP");
 
 	ret = UPDATE_PRO;
 	
@@ -206,7 +310,7 @@ static int udp_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 	child->child = NULL;
 	child->next = NULL;
 
-	snprintf(summ->proto, STR_PROTO_LEN, "udp");
+	snprintf(summ->proto, STR_PROTO_LEN, "UDP");
 
 	ret = UPDATE_PRO;
 	
@@ -359,7 +463,7 @@ static int arp_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 	child->child = NULL;
 	child->next = NULL;
 
-	snprintf(summ->proto, STR_PROTO_LEN, "arp");
+	snprintf(summ->proto, STR_PROTO_LEN, "ARP");
 
 	ret = UPDATE_PRO;
 	
@@ -371,7 +475,7 @@ err:
 	return -1;
 
 }
-static int ip_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
+static int ipv4_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 		const unsigned char *data, unsigned int size)
 {
 	uint8_t proto;
@@ -460,6 +564,9 @@ static int ip_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 	case IP_PROTO_TCP:
 		ret = tcp_dump(summ, &(atree->next), data + NPT_IPV4_H, size - NPT_IPV4_H);
 		break;
+	case IP_PROTO_ICMPV4:
+		ret = icmpv4_dump(summ, &(atree->next), data + NPT_IPV4_H, size - NPT_IPV4_H);
+		break;
 	}
 
 	if (ret < 0 || ((ret & UPDATE_DST) != UPDATE_DST))
@@ -479,7 +586,7 @@ static int ip_dump(struct pkt_summary *summ, struct pkt_analytree **analytree,
 		}
 	}
 	if (ret < 0 || ((ret & UPDATE_PRO) != UPDATE_PRO))
-		snprintf(summ->proto, STR_PROTO_LEN, "ip");
+		snprintf(summ->proto, STR_PROTO_LEN, "IP");
 
 	ret = UPDATE_DST | UPDATE_SRC | UPDATE_INFO | UPDATE_PRO;
 	
@@ -553,7 +660,7 @@ static int ethernet_dump(struct pkt_summary *summ, struct pkt_analytree **analyt
 	ret = -1;
 	switch(proto) {
 	case ETHERTYPE_IP:
-		ret = ip_dump(summ, &(atree->next), data + NPT_ETH_H, size - NPT_ETH_H);
+		ret = ipv4_dump(summ, &(atree->next), data + NPT_ETH_H, size - NPT_ETH_H);
 		break;
 	case ETHERTYPE_ARP:
 		ret = arp_dump(summ, &(atree->next), data + NPT_ETH_H, size - NPT_ETH_H);
@@ -573,7 +680,7 @@ static int ethernet_dump(struct pkt_summary *summ, struct pkt_analytree **analyt
 				hdr->ether_shost[4], hdr->ether_shost[5]);
 
 	if (ret < 0 || ((ret & UPDATE_PRO) != UPDATE_PRO))
-		snprintf(summ->proto, STR_PROTO_LEN, "ethernet");
+		snprintf(summ->proto, STR_PROTO_LEN, "ETHERNET");
 
 	if (ret < 0 || ((ret & UPDATE_INFO) != UPDATE_INFO)) {
 		if (hdr->ether_dhost[0] == 0xff && hdr->ether_dhost[1] == 0xff &&
