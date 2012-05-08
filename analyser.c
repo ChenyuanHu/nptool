@@ -57,9 +57,9 @@ static int icmpv4_dump(struct pkt_summary *summ, struct pkt_analytree **analytre
 	ident = ntohs(hdr->hun.echo.id);
 	seq_num = ntohs(hdr->hun.echo.seq);
 
-	if (type == 8)
+	if (type == ICMP_ECHO)
 		pchar = "Echo (ping) request";
-	else if (type == 0)
+	else if (type == ICMP_ECHOREPLY)
 		pchar = "Echo (ping) reply";
 	else
 		pchar = "";
@@ -87,7 +87,7 @@ static int icmpv4_dump(struct pkt_summary *summ, struct pkt_analytree **analytre
 		fprintf(stderr, "malloc err %s\n", __FUNCTION__);
 		goto err;
 	}
-	if (type == 0 && type == 8) {
+	if (type == ICMP_ECHOREPLY && type == ICMP_ECHO) {
 		child = child->next;
 		snprintf(child->comment, STR_INFO_LEN, "Checksum: %u", checksum);
 		child->child = NULL;
