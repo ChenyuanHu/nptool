@@ -15,4 +15,7 @@ all: $(OBJECTS)
 
 clean:
 	make -C gtk clean
-	rm -rf nptool $(OBJECTS)
+	rm -rf nptool $(OBJECTS) tags
+
+tags:
+	ctags -R *
