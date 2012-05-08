@@ -315,6 +315,7 @@ static void update_analyse_tree(GtkWidget *widget, gpointer arg)
 
 		gtk_tree_store_clear(main_win->analytree->store);
 		add_to_gtk_tree(main_win->analytree->store, NULL, analytree);
+		gtk_tree_view_expand_all(GTK_TREE_VIEW(main_win->analytree->wid));
 	}
 }
 static void pktlist_changed(GtkWidget *widget, gpointer arg)
