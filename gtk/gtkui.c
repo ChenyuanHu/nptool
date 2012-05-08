@@ -238,7 +238,7 @@ static int byte_data_to_string(unsigned char *data, char *strdata, int caplen, i
 	}
 	return l;
 }
-static void updata_byteview(GtkWidget *widget, gpointer arg)
+static void update_byteview(GtkWidget *widget, gpointer arg)
 {
 	GtkTreeIter iter;
 	GtkTreeModel *model;
@@ -300,7 +300,7 @@ static void add_to_gtk_tree(GtkTreeStore *store, GtkTreeIter *parent,
 	add_to_gtk_tree(store, &iter, tree->child);
 	add_to_gtk_tree(store, parent, tree->next);
 }
-static void updata_analyse_tree(GtkWidget *widget, gpointer arg)
+static void update_analyse_tree(GtkWidget *widget, gpointer arg)
 {
 	GtkTreeIter iter;
 	GtkTreeModel *model;
@@ -320,10 +320,10 @@ static void updata_analyse_tree(GtkWidget *widget, gpointer arg)
 static void pktlist_changed(GtkWidget *widget, gpointer arg)
 {
 	/* updata byte_view */
-	updata_byteview(widget, arg);
+	update_byteview(widget, arg);
 
 	/* updata analyse tree */
-	updata_analyse_tree(widget, arg);
+	update_analyse_tree(widget, arg);
 }
 static struct gtkui_pktlist* build_pktlist()
 {
